@@ -3,7 +3,7 @@ import TopBar from "@/components/TopBar";
 import SubNav from "@/components/SubNav";
 import PositionList from "@/components/PositionList";
 import DriverDetailCard from "@/components/DriverDetailCard";
-import TrackMapPlaceholder from "@/components/TrackMapPlaceholder";
+import TrackMap from "@/components/TrackMap";
 import SessionInfoCard from "@/components/SessionInfoCard";
 import { getDriversForSession } from "@/data/mockDrivers";
 import { mockMeetings } from "@/data/mockMeetings";
@@ -54,7 +54,12 @@ const Index = () => {
 
         {/* Map area with floating panels */}
         <section className="relative flex-1">
-          <TrackMapPlaceholder circuitName={selected.meeting.circuitShortName} />
+          <TrackMap
+            circuitName={selected.meeting.circuitShortName}
+            drivers={drivers}
+            selectedCode={selectedCode}
+            onSelectDriver={setSelectedCode}
+          />
 
           {/* Floating driver detail card on the left */}
           <div className="absolute top-4 left-4 z-10">
