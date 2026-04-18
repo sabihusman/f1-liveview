@@ -60,9 +60,15 @@ function buildDrivers(order: string[]): Driver[] {
       team: seed.team,
       teamColor: TEAM_COLORS[seed.team],
       positionChange: position === 10 ? "up" : position === 11 ? "down" : null,
-      bestLap: isAlo ? "1:17.904" : `1:1${(7 + (idx % 4)).toString()}.${(100 + idx * 37) % 1000}`,
+      bestLap: isAlo
+        ? "1:17.904"
+        : `1:${(17 + (idx % 4)).toString().padStart(2, "0")}.${((100 + idx * 37) % 1000).toString().padStart(3, "0")}`,
       sectors: [
-        { sector: 1, time: isAlo ? "36.022" : `36.${(100 + idx * 13) % 1000}`, isFastest: isAlo },
+        {
+          sector: 1,
+          time: isAlo ? "36.022" : `36.${((100 + idx * 13) % 900 + 100).toString().padStart(3, "0")}`,
+          isFastest: isAlo,
+        },
         { sector: 2, time: null },
         { sector: 3, time: null },
       ],
