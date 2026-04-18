@@ -53,6 +53,34 @@ function buildDrivers(order: string[]): Driver[] {
     const seed = DRIVER_POOL.find((d) => d.code === code)!;
     const position = idx + 1;
     const isAlo = code === "ALO";
+
+    // Gap & interval (cumulative deltas)
+    const intervalSec = idx === 0 ? 0 : 0.18 + ((idx * 137) % 900) / 1000;
+    const gapSec = idx === 0 ? 0 : intervalSec * idx + ((idx * 53) % 700) / 1000;
+    const formatDelta = (s: number) =>
+      `+${s.toFixed(3)}`;
+
+    // Last lap (slightly slower than best on average)
+    const baseLap = isAlo ? "1:17.904" : `1:${(17 + (idx % 4)).toString().padStart(2, "0")}.${((100 + idx * 37) % 1000).toString().padStart(3, "0")}`;
+    const lastLapMs = ((200 + idx * 71) % 900);
+    const lastLap = `1:${(17 + ((idx + 1) % 5)).toString().padStart(2, "0")}.${lastLapMs.toString().padStart(3, "0")}`;
+
+    // Tire stints
+    const compounds: Array<'S' | 'M' | 'H'> = ["S", "M", "H"];
+    const currentCompound = compounds[idx % 3];
+    const tireAge = 4 + (idx * 3) % 18;
+    const pitCount = idx % 4 === 0 ? 0 : (idx % 3) + 1;
+    const stints = [
+      ...(pitCount >= 1 ? [{ compound: compounds[(idx + 1) % 3], laps: 8 + (idx * 2) % 12 }] : []),
+      ...(pitCount >= 2 ? [{ compound: compounds[(idx + 2) % 3], laps: 6 + (idx * 5) % 10 }] : []),
+      ...(pitCount >= 3 ? [{ compound: compounds[(idx) % 3], laps: 5 + idx % 8 }] : []),
+      { compound: currentCompound, laps: tireAge },
+    ];
+
+    // Last-lap status indicator
+    const status: Driver["lastLapStatus"] =
+      idx === 0 ? "purple" : idx % 5 === 1 ? "green" : "normal";
+
     return {
       position,
       code: seed.code,
@@ -60,9 +88,7 @@ function buildDrivers(order: string[]): Driver[] {
       team: seed.team,
       teamColor: TEAM_COLORS[seed.team],
       positionChange: position === 10 ? "up" : position === 11 ? "down" : null,
-      bestLap: isAlo
-        ? "1:17.904"
-        : `1:${(17 + (idx % 4)).toString().padStart(2, "0")}.${((100 + idx * 37) % 1000).toString().padStart(3, "0")}`,
+      bestLap: baseLap,
       sectors: [
         {
           sector: 1,
@@ -78,7 +104,14 @@ function buildDrivers(order: string[]): Driver[] {
       drs: idx % 3 === 0,
       throttle: isAlo ? 62 : (idx * 17) % 100,
       brake: isAlo ? 18 : (idx * 11) % 60,
-      tireCompound: (["S", "M", "H"] as const)[idx % 3],
+      tireCompound: currentCompound,
+      gap: idx === 0 ? "LEADER" : formatDelta(gapSec),
+      interval: idx === 0 ? "—" : formatDelta(intervalSec),
+      lastLap,
+      lastLapStatus: status,
+      tireAge,
+      pitCount,
+      stints,
     };
   });
 }
