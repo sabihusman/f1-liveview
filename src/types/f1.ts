@@ -14,6 +14,19 @@ export interface Driver {
   throttle?: number;
   brake?: number;
   tireCompound?: 'S' | 'M' | 'H' | 'I' | 'W';
+  // Timing tower
+  gap?: string;          // gap to leader, e.g. "+0.412" or "LEADER" or "+1 LAP"
+  interval?: string;     // interval to car ahead
+  lastLap?: string;      // last completed lap time
+  lastLapStatus?: 'purple' | 'green' | 'yellow' | 'normal'; // session best / personal best
+  tireAge?: number;      // laps on current set
+  pitCount?: number;     // number of pit stops
+  stints?: TireStint[];  // stint history
+}
+
+export interface TireStint {
+  compound: 'S' | 'M' | 'H' | 'I' | 'W';
+  laps: number;
 }
 
 export interface SectorTime {
